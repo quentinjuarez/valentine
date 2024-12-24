@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Est-ce que tu veux sortir avec moi ? ❤️</title>
+    <style>
+      :root {
+        --btn-w: 70px;
+        --btn-h: 50px;
+        --primary-color: #ff3366;
+        --hover-color: #ff6699;
+        --background-color: #ffe6e6;
+        --text-color: #333;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        background-color: var(--background-color);
+        color: var(--primary-color);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease-in-out, height 0.5s ease-in-out;
+        height: 0;
+      }
+
+      .visible {
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .buttons {
+        position: relative;
+        display: flex;
+        gap: 20px;
+      }
+
+      .btn {
+        font-size: 1.5rem;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s, transform 50ms;
+        width: var(--btn-w);
+        height: var(--btn-h);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
+
+      .btn-yes {
+        background-color: var(--primary-color);
+        color: white;
+        transform: scale(1);
+      }
+
+      .btn-yes:hover {
+        background-color: var(--hover-color);
+      }
+
+      .btn-no {
+        background-color: #ccc;
+        color: var(--text-color);
+        position: relative;
+      }
+
+      .btn-wrapper {
+        padding: var(--btn-h) var(--btn-w);
+        position: relative;
+      }
+
+      .thank-you-message {
+        font-size: 2rem;
+        color: var(--primary-color);
+      }
+
+      .img {
+        margin-top: var(--btn-h);
+      }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const yesBtn = document.querySelector('.btn-yes');
+        const noBtn = document.querySelector('.btn-no');
+        const wrapper = noBtn.closest('.btn-wrapper');
+        const firstSection = document.querySelector('.first');
+        const secondSection = document.querySelector('.second');
+        const message = document.querySelector('.thank-you-message');
+
+        // Check for the cookie
+        if (getCookie('valentineAccepted') === 'true') {
+          hideFirstSection();
+          showSecondSection();
+        }
+
+        let scale = 1;
+
+        // Move "No" button when hovered near
+        wrapper.addEventListener('mousemove', (event) => {
+          const btnRect = noBtn.getBoundingClientRect();
+          const wrapperRect = wrapper.getBoundingClientRect();
+
+          const mouseX = event.clientX - wrapperRect.left;
+          const mouseY = event.clientY - wrapperRect.top;
+
+          const btnCenterX =
+            btnRect.left + btnRect.width / 2 - wrapperRect.left;
+          const btnCenterY = btnRect.top + btnRect.height / 2 - wrapperRect.top;
+
+          const deltaX = mouseX - btnCenterX;
+          const deltaY = mouseY - btnCenterY;
+
+          const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+
+          const MAX_DISTANCE = Math.sqrt(
+            (btnRect.width / 2) ** 2 + (btnRect.height / 2) ** 2
+          );
+          if (distance < MAX_DISTANCE) {
+            noBtn.style.transform = `translate(${-deltaX * 2}px, ${
+              -deltaY * 2
+            }px)`;
+          }
+        });
+
+        noBtn.addEventListener('click', () => {
+          scale += 0.2;
+          yesBtn.style.transform = `scale(${scale})`;
+        });
+
+        yesBtn.addEventListener('click', () => {
+          setCookie('valentineAccepted', 'true', 7); // Save cookie for 7 days
+          transitionToSecondSection();
+        });
+
+        function transitionToSecondSection() {
+          firstSection.classList.remove('visible');
+          firstSection.classList.add('hidden');
+          secondSection.classList.remove('hidden');
+          secondSection.classList.add('visible');
+          message.textContent = 'Merci ! ❤️ Allons fêter ça !';
+        }
+
+        function showSecondSection() {
+          secondSection.classList.add('visible');
+          secondSection.classList.remove('hidden');
+          message.textContent =
+            'Content de te revoir ! ❤️ Continuons la fête !';
+        }
+
+        function hideFirstSection() {
+          firstSection.classList.remove('visible');
+          firstSection.classList.add('hidden');
+        }
+
+        // Helper function to set a cookie
+        function setCookie(name, value, days) {
+          const d = new Date();
+          d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+          const expires = 'expires=' + d.toUTCString();
+          document.cookie = name + '=' + value + ';' + expires + ';path=/';
+        }
+
+        // Helper function to get a cookie
+        function getCookie(name) {
+          const decodedCookie = decodeURIComponent(document.cookie);
+          const cookies = decodedCookie.split(';');
+          name = name + '=';
+          for (let cookie of cookies) {
+            while (cookie.charAt(0) === ' ') {
+              cookie = cookie.substring(1);
+            }
+            if (cookie.indexOf(name) === 0) {
+              return cookie.substring(name.length, cookie.length);
+            }
+          }
+          return '';
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="first visible">
+      <h1>Est-ce que tu veux sortir avec moi ? ❤️</h1>
+      <div class="buttons">
+        <div class="btn-wrapper">
+          <button class="btn btn-yes">Oui</button>
+        </div>
+        <div class="btn-wrapper">
+          <button class="btn btn-no">Non</button>
+        </div>
+      </div>
+      <div class="img">
+        <img
+          src="https://media.tenor.com/T92OdlBRddYAAAAM/pup.gif"
+          alt="Chiot"
+        />
+      </div>
+    </div>
+    <div class="second hidden">
+      <div class="thank-you-message"></div>
+      <div class="img">
+        <img src="https://media.tenor.com/_NMzaxfKAJYAAAAM/excited-dog.gif" />
+      </div>
+    </div>
+  </body>
+</html>
